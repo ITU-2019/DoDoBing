@@ -10,3 +10,4 @@ install:
   - pip install nose
 script:
   - nosetests -d test.py
+  - nosetests -dwv gorilla\src test.py
