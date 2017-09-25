@@ -1,0 +1,12 @@
+language: python
+sudo: required
+notifications:
+  email: false
+python:
+  - 3.6
+  - 2.7
+
+install:
+  - pip install nose
+script:
+  - nosetests -d test.py
