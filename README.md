@@ -1,4 +1,7 @@
 # Master Repo for Algorithm Design
+[![Build Status](https://travis-ci.org/Sebastian-ba/DoDoBing.svg?branch=fix-build)](https://travis-ci.org/Sebastian-ba/DoDoBing)
+<a href="https://www.codacy.com/app/Sebastian-ba/DoDoBing/dashboard"><img src="https://api.codacy.com/project/badge/Grade/c098136ef81345b78c480ee695314a21"/></a>
+
 
 ### Requirements
 
