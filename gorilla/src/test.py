@@ -1,14 +1,5 @@
 from main import *
 
-def test_1():
-    assert 1 == 1
-
-def test_2():
-    assert "1" == "1"
-
-def test_3():
-    assert 2 == 2
-
 def test_parse_toys():
     dna_parsed = parse_dna_file("../data/Toy_FASTAs-in.txt")
     assert len(dna_parsed) == 3
