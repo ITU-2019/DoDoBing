@@ -11,9 +11,9 @@ def parse_rail_file(filename):
 
     node_counter = 0
     edge_counter = 0
-    
+
     flow = 0
-    
+
     parsing_nodes = False
     parsing_edges = False
 
@@ -32,11 +32,13 @@ def parse_rail_file(filename):
                 nodes[from_node_id].addEdgeTo(edges[edge_counter], edge_counter)
                 nodes[to_node_id].addEdgeFrom(edges[edge_counter], edge_counter)
 
+                edge_counter += 1
+
                 if edge_counter == total_edges:
                     parsing_edges = False
                 continue
             if parsing_nodes:
-                nodes.append(Node(line[:-1]))
+                nodes.append(Node(line[:-1], node_counter))
                 node_counter += 1
                 if node_counter == total_nodes:
                     parsing_nodes = False
@@ -64,8 +66,9 @@ class Edge:
 
 
 class Node:
-    def __init__(self, name):
+    def __init__(self, name, node_id):
         self.name = name
+        self.id = node_id
         self.related_edges = {}
 
     def addEdgeTo(self, edge, edge_id):
@@ -78,10 +81,52 @@ class Node:
 def output():
     pass
 
-def get_valid_path(nodes, edges, start, target):
-    pass
+#BFS
+def get_valid_path(nodes, edges):
+	path_steps = {}
 
-''' 
+	# visited nodes tracker
+	visited_nodes = [False]*(len(nodes))
+	# queue of nodes to check from
+	queue = []
+
+	# queue start Node
+	queue.append(nodes[0])
+	path_steps[0] = None
+	visited_nodes[0] = True
+
+	while queue:
+		# dequeue first vertex in queue
+		cur_node = queue.pop(0)
+
+		for nid, eid in cur_node.related_edges.items():
+			# check if we're going in the correct direction
+			if edges[eid].to_node_id == nid:
+				continue
+			# check if we are at max capacity
+			if (edges[eid].capacity - edges[eid].flow) == 0:
+				continue
+			# last node, the end
+			if nid == (nodes.length -1):
+				path_steps[nid] = cur_node.id
+				return get_full_path(path_steps, nid)
+			# check if we visited node before
+			if visited_nodes[nid] == False:
+				queue.append(nodes[nid])
+				path_steps[nid] = cur_node.id
+				visited_nodes[nid] = True
+	return None
+
+def get_full_path(path_dict, nid):
+	cur_path = []
+	while path_dict[nid] != None:
+		cur_path.append(nid)
+		nid = path_dict[nid]
+	cur_path.append(0)
+	return cur_path.reverse()
+
+
+'''
     returns the current maximum throughput on the given path.
 '''
 
@@ -95,7 +140,7 @@ def bottleneck(nodes, edges, path):
             throughput = capacity - edges[edge_id].flow
             if throughput < max_throughput or max_throughput == -1:
                 max_throughput = throughput
-         
+
     return max_throughput
 
 '''Helper methods end'''
@@ -105,21 +150,21 @@ def augment(nodes, edges, path):
     max_throughput = bottleneck(nodes, edges, path)
     for i in range(len(path) - 1):
         edge_id = nodes[path[i]].related_edges[path[i+1]]
-        if edges[edge_id].from_node_id == path[i]: 
-            #if edge is a forward edge then increase flow 
+        if edges[edge_id].from_node_id == path[i]:
+            #if edge is a forward edge then increase flow
             edges[edge_id].flow += max_throughput
         else:
             #if edge is a backward edge, decrease the flow
             edges[edge_id].flow -= max_throughput
     return edges
-    
-def max_flow_alg(nodes, edges, start, target):
-    path = get_valid_path(nodes, edges, start, target)
+
+def max_flow_alg(nodes, edges):
+    path = get_valid_path(nodes, edges)
     if not(path):
         return None
-    while not(path):
+    while path:
         edges = augment(nodes, edges, path)
-        path = get_valid_path(nodes, edges, start, target)
+        path = get_valid_path(nodes, edges)
     return edges
 '''Algorithm end'''
 

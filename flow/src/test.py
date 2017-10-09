@@ -2,9 +2,9 @@ from main import *
 
 ''' Simple Test Graph '''
 edge1 = Edge(0,1,5,2)
-node1 = Node("s")
+node1 = Node("s", 0)
 node1.addEdgeTo(edge1, 0)
-node2 = Node("t")
+node2 = Node("t", 1)
 node2.addEdgeFrom(edge1, 0)
 nodes = [node1,node2]
 edges = [edge1]
@@ -16,20 +16,20 @@ e3 = Edge(2,3,30,10)
 e4 = Edge(2,1,10,6)
 e5 = Edge(3,1,20,5)
 
-s = Node("s")
+s = Node("s", 0)
 s.addEdgeTo(e1,0)
 s.addEdgeTo(e2,1)
 
-t = Node("t")
+t = Node("t", 1)
 t.addEdgeFrom(e4,3)
 t.addEdgeFrom(e5,4)
 
-n2 = Node("n2")
+n2 = Node("n2", 2)
 n2.addEdgeFrom(e2,1)
 n2.addEdgeTo(e3,2)
 n2.addEdgeTo(e4,3)
 
-n3 = Node("n3")
+n3 = Node("n3", 3)
 n3.addEdgeFrom(e1,0)
 n3.addEdgeFrom(e3,2)
 n3.addEdgeTo(e5,4)
@@ -72,20 +72,20 @@ def test_bottleneckTest4():
 	e4 = Edge(2,1,10,6)
 	e5 = Edge(3,1,-1,5)
 
-	s = Node("s")
+	s = Node("s", 0)
 	s.addEdgeTo(e1,0)
 	s.addEdgeTo(e2,1)
 
-	t = Node("t")
+	t = Node("t", 1)
 	t.addEdgeFrom(e4,3)
 	t.addEdgeFrom(e5,4)
 
-	n2 = Node("n2")
+	n2 = Node("n2", 2)
 	n2.addEdgeFrom(e2,1)
 	n2.addEdgeTo(e3,2)
 	n2.addEdgeTo(e4,3)
 
-	n3 = Node("n3")
+	n3 = Node("n3", 3)
 	n3.addEdgeFrom(e1,0)
 	n3.addEdgeFrom(e3,2)
 	n3.addEdgeTo(e5,4)
