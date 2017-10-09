@@ -11,9 +11,9 @@ def parse_rail_file(filename):
 
     node_counter = 0
     edge_counter = 0
-    
+
     flow = 0
-    
+
     parsing_nodes = False
     parsing_edges = False
 
@@ -68,7 +68,7 @@ class Edge:
 class Node:
     def __init__(self, name, node_id):
         self.name = name
-		self.id = node_id
+        self.id = node_id
         self.related_edges = {}
 
     def addEdgeTo(self, edge, edge_id):
@@ -89,7 +89,7 @@ def get_valid_path(nodes, edges):
 	visited_nodes = [False]*(len(nodes))
 	# queue of nodes to check from
 	queue = []
-	
+
 	# queue start Node
 	queue.append(nodes[0])
 	path_steps[0] = None
@@ -126,7 +126,7 @@ def get_full_path(path_dict, nid):
 	return cur_path.reverse()
 
 
-''' 
+'''
     returns the current maximum throughput on the given path.
 '''
 
@@ -140,7 +140,7 @@ def bottleneck(nodes, edges, path):
             throughput = capacity - edges[edge_id].flow
             if throughput < max_throughput or max_throughput == -1:
                 max_throughput = throughput
-         
+
     return max_throughput
 
 '''Helper methods end'''
@@ -150,14 +150,14 @@ def augment(nodes, edges, path):
     max_throughput = bottleneck(nodes, edges, path)
     for i in range(len(path) - 1):
         edge_id = nodes[path[i]].related_edges[path[i+1]]
-        if edges[edge_id].from_node_id == path[i]: 
-            #if edge is a forward edge then increase flow 
+        if edges[edge_id].from_node_id == path[i]:
+            #if edge is a forward edge then increase flow
             edges[edge_id].flow += max_throughput
         else:
             #if edge is a backward edge, decrease the flow
             edges[edge_id].flow -= max_throughput
     return edges
-    
+
 def max_flow_alg(nodes, edges):
     path = get_valid_path(nodes, edges)
     if not(path):
