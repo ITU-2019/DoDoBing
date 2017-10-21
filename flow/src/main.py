@@ -1,7 +1,5 @@
 '''Imports'''
 import sys
-#import re
-#import string
 
 '''Parse'''
 
@@ -25,15 +23,13 @@ def parse_rail_file(filename):
         for line in lines:
             if parsing_edges:
                 string_integers = line.split(' ')
-                from_node_id = int(string_integers[0])
-                to_node_id = int(string_integers[1])
+                node_id_1 = int(string_integers[0])
+                node_id_2 = int(string_integers[1])
                 capacity = int(string_integers[2])
-                edges.append( Edge(from_node_id, to_node_id, capacity, flow))
-                nodes[from_node_id].addEdgeTo(edges[edge_counter], edge_counter)
-                nodes[to_node_id].addEdgeFrom(edges[edge_counter], edge_counter)
-
+                edges.append( Edge(node_id_1, node_id_2, capacity, flow))
+                nodes[node_id_1].addEdgeTo(node_id_2, edge_counter)
+                nodes[node_id_2].addEdgeTo(node_id_1, edge_counter)
                 edge_counter += 1
-
                 if edge_counter == total_edges:
                     parsing_edges = False
                 continue
@@ -56,13 +52,19 @@ def parse_rail_file(filename):
 '''Parse end'''
 
 '''Helper methods'''
-
 class Edge:
-    def __init__(self, from_node_id, to_node_id, capacity, flow):
-        self.from_node_id = from_node_id
-        self.to_node_id = to_node_id
+    def __init__(self, node_id_1, node_id_2, capacity, flow):
+        self.node_id_1 = node_id_1
+        self.node_id_2 = node_id_2
         self.capacity = capacity
         self.flow = flow
+        self.forward = True
+
+    def is_forward(self, node_id_1, node_id_2):
+        return self.node_id_1 == node_id_1 and self.node_id_2 == node_id_2
+    
+    def __str__(self):
+        return str(self.node_id_1) + " " + str(self.node_id_2) + " " + str(self.capacity) + " " + str(self.flow)
 
 class Node:
     def __init__(self, name, node_id):
@@ -70,15 +72,12 @@ class Node:
         self.id = node_id
         self.related_edges = {}
 
-    def addEdgeTo(self, edge, edge_id):
-        self.related_edges[edge.to_node_id] = edge_id
+    def addEdgeTo(self, node_id, edge_id):
+        self.related_edges[node_id] = edge_id
+    
+    def __str__(self):
+        return str(self.name) + " " + str(self.id) + " " + str(self.related_edges)
 
-    def addEdgeFrom(self, edge, edge_id):
-        self.related_edges[edge.from_node_id] = edge_id
-
-
-def output():
-    pass
 
 ''' BFS '''
 def get_valid_path(nodes, edges):
@@ -97,12 +96,9 @@ def get_valid_path(nodes, edges):
 
     while queue:
         # dequeue first vertex in queue
-        cur_node = queue.pop(0)
 
+        cur_node = queue.pop(0)
         for nid, eid in cur_node.related_edges.items():
-            # check if we're going in the correct direction
-            if edges[eid].to_node_id == cur_node.id:
-                continue
             # check if we are at max capacity
             if (edges[eid].capacity - edges[eid].flow) == 0:
                 continue
@@ -125,45 +121,84 @@ def get_full_path(path_dict, nid):
         nid = path_dict[nid]
     cur_path.append(0)
     cur_path.reverse()
+    
     return cur_path
 
 
-'''
-    returns the current maximum throughput on the given path.
-'''
-
+'''returns the current maximum throughput on the given path.'''
 def bottleneck(nodes, edges, path):
     # this is clearly positive infinity
     max_throughput = -1
-    for i in range(len(path)-1):
-        edge_id = nodes[path[i]].related_edges[path[i+1]]
+    for i in range(len(path) - 1):
+        edge_id = nodes[path[i]].related_edges[path[i + 1]]
         capacity = edges[edge_id].capacity
+        flow = edges[edge_id].flow
         if capacity >= 0:
-            throughput = capacity - edges[edge_id].flow
+            if edges[edge_id].is_forward(path[i],path[i + 1]):
+                throughput = capacity - flow
+            else: 
+                throughput = flow + capacity - flow
+                edges[edge_id].forward = False
+
             if throughput < max_throughput or max_throughput == -1:
                 max_throughput = throughput
-
     return max_throughput
+
+def min_cut(nodes, edges):
+    a = set([0])
+    queue = []
+    queue.append(nodes[0])
+    while queue:
+        cur_node = queue.pop(0)
+        for nid, eid in cur_node.related_edges.items():
+            if edges[eid].capacity == edges[eid].flow or nid in a:
+                continue
+            a.add(nid)
+            queue.append(nodes[nid])
+  
+    b = set()
+    for nid in a:
+        cur_node = nodes[nid]
+        for nid, eid in cur_node.related_edges.items():
+            if not(edges[eid].node_id_1 in a):
+                b.add(nid)
+
+    a = a | b
+
+    min_cut_edges = []
+    for nid in a:
+        cur_node = nodes[nid]
+        for nid, eid in cur_node.related_edges.items():
+            if not(edges[eid].node_id_2 in a) or not(edges[eid].node_id_1 in a):
+                min_cut_edges.append(edges[eid])
+    return min_cut_edges
+
+
+def output(edges):
+    if edges:
+        for edge in edges:
+            print(str(edge))
+    else :
+        print("There is no ideal cut")
 
 '''Helper methods end'''
 
 '''Algorithm'''
 def augment(nodes, edges, path):
     max_throughput = bottleneck(nodes, edges, path)
+
     for i in range(len(path) - 1):
         edge_id = nodes[path[i]].related_edges[path[i+1]]
-        if edges[edge_id].from_node_id == path[i]:
-            #if edge is a forward edge then increase flow
+        if edges[edge_id].forward:
             edges[edge_id].flow += max_throughput
         else:
-            #if edge is a backward edge, decrease the flow
             edges[edge_id].flow -= max_throughput
+            edges[edge_id].forward = True
+            
     return edges
 
 def max_flow_alg(nodes, edges):
     path = get_valid_path(nodes, edges)
-    if not(path):
-        return None
     while path:
         edges = augment(nodes, edges, path)
         path = get_valid_path(nodes, edges)
@@ -175,10 +210,7 @@ if __name__ == "__main__":
     args = sys.argv
     if len(args) == 2:
         nodes, edges = parse_rail_file(args[1])
-        for edge in max_flow_alg(nodes, edges):
-            # "The maximum value of an s-t flow is equal to the minimum capacity over all s-t cuts"
-            # To find the minimum cut flow must be > 0 and flow = capacity
-            if edge.flow > 0 and edge.flow == edge.capacity:
-                print(edge.from_node_id, edge.to_node_id, edge.flow)
-
+        edges = max_flow_alg(nodes, edges)
+        min_cut_edges = min_cut(nodes, edges)
+        output(min_cut_edges)
 '''END CODE'''
