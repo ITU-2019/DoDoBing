@@ -180,6 +180,7 @@ def output(edges):
             print(str(edge))
     else :
         print("There is no ideal cut")
+    
 
 '''Helper methods end'''
 
@@ -210,7 +211,18 @@ if __name__ == "__main__":
     args = sys.argv
     if len(args) == 2:
         nodes, edges = parse_rail_file(args[1])
+
+
+        edges[55].capacity = 0
+        edges[56].capacity = 0
+        print(str(edges[56]))
+        print(str(edges[55]))
         edges = max_flow_alg(nodes, edges)
+
+        flow_sum_org = 0
+        for n_id, edge_id in nodes[0].related_edges.items():
+            flow_sum_org += edges[edge_id].flow
+        print("total flow:", flow_sum_org)
         min_cut_edges = min_cut(nodes, edges)
         output(min_cut_edges)
 '''END CODE'''
