@@ -62,7 +62,7 @@ class Edge:
 
     def is_forward(self, node_id_1, node_id_2):
         return self.node_id_1 == node_id_1 and self.node_id_2 == node_id_2
-    
+
     def __str__(self):
         return str(self.node_id_1) + " " + str(self.node_id_2) + " " + str(self.capacity) + " " + str(self.flow)
 
@@ -74,15 +74,15 @@ class Node:
 
     def addEdgeTo(self, node_id, edge_id):
         self.related_edges[node_id] = edge_id
-    
+
     def __str__(self):
         return str(self.name) + " " + str(self.id) + " " + str(self.related_edges)
 
 ''' Optimized BFS. Doesn't do much for out very small dataset,
     but should help with large/ very large data sets.
-    
+
     Also ensures that we always
-    look at nodes in the expected (correct) fashion - highest remaining capacity 
+    look at nodes in the expected (correct) fashion - highest remaining capacity
     node first.
 
     Can maybe be further tuned to always return the the most optimal "path" not
@@ -130,7 +130,7 @@ def optimized_valid_path(nodes, edges):
                 visited_nodes[nid] = True
     return None
 
-''' BFS 
+''' BFS
     Unused due to opt. BFS being implemented.
 '''
 def get_valid_path(nodes, edges):
@@ -186,7 +186,7 @@ def bottleneck(nodes, edges, path):
         if capacity >= 0:
             if edges[edge_id].is_forward(path[i],path[i + 1]):
                 throughput = capacity - flow
-            else: 
+            else:
                 throughput = flow + capacity - flow
                 edges[edge_id].forward = False
 
@@ -205,7 +205,7 @@ def min_cut(nodes, edges):
                 continue
             a.add(nid)
             queue.append(nodes[nid])
-  
+
     b = set()
     for nid in a:
         cur_node = nodes[nid]
@@ -230,7 +230,7 @@ def output(edges):
             print(str(edge))
     else :
         print("There is no ideal cut")
-    
+
 
 '''Helper methods end'''
 
@@ -245,7 +245,7 @@ def augment(nodes, edges, path):
         else:
             edges[edge_id].flow -= max_throughput
             edges[edge_id].forward = True
-            
+
     return edges
 
 
@@ -263,7 +263,7 @@ if __name__ == "__main__":
     if len(args) == 2:
         nodes, edges = parse_rail_file(args[1])
 
-
+        # These lines are ot test the reduced capacity in Minsk -------------------------------------------------------
         edges[55].capacity = 0
         edges[56].capacity = 0
         print(str(edges[56]))
@@ -274,6 +274,9 @@ if __name__ == "__main__":
         for n_id, edge_id in nodes[0].related_edges.items():
             flow_sum_org += edges[edge_id].flow
         print("total flow:", flow_sum_org)
+        # -------------------------------------------------------------------------------------------------------------
+
+        # edges = max_flow_alg(nodes, edges)
         min_cut_edges = min_cut(nodes, edges)
         output(min_cut_edges)
 '''END CODE'''
