@@ -78,8 +78,61 @@ class Node:
     def __str__(self):
         return str(self.name) + " " + str(self.id) + " " + str(self.related_edges)
 
+''' Optimized BFS. Doesn't do much for out very small dataset,
+    but should help with large/ very large data sets.
+    
+    Also ensures that we always
+    look at nodes in the expected (correct) fashion - highest remaining capacity 
+    node first.
 
-''' BFS '''
+    Can maybe be further tuned to always return the the most optimal "path" not
+    based on "steps".
+'''
+def optimized_valid_path(nodes, edges):
+    # final steps dict to return, mapping is (nodeid -> nodeid)
+    path_steps = {}
+
+    # visited nodes tracker
+    visited_nodes = [False]*(len(nodes))
+
+    # sorted queue based on (cap - flow), inserted structure is (value, nodeid) tuples
+    sorted_queue = []
+
+    # enqueue start node, has 0 capacity/flow, since we do not have a preceding node
+    sorted_queue.append((0, nodes[0]))
+
+    # empty start path
+    path_steps[0] = None
+    visited_nodes[0] = True
+
+    while sorted_queue:
+        #dequeue first vertex (highest value)
+        cur_node = sorted_queue.pop(0)[1]
+
+        # iterate all vertex edges
+        for nid, eid in cur_node.related_edges.items():
+            # sanity check if we are at max capacity
+            if (edges[eid].capacity - edges[eid].flow) == 0:
+                continue
+            # last node, the end
+            if nid == (len(nodes) - 1):
+                path_steps[nid] = cur_node.id
+                return get_full_path(path_steps, nid)
+            # check if we visited node before
+
+            # do we want to check if there is a better path in terms of node -> node capacity or should we just take them in the highest order no matter what?
+            if visited_nodes[nid] == False:
+                # enqueue val, node
+                sorted_queue.append((edges[eid].capacity - edges[eid].flow, nodes[nid]))
+                # sort list based on val in highest first order.
+                sorted_queue = sorted(sorted_queue, key=lambda tup: tup[0], reverse=True)
+                path_steps[nid] = cur_node.id
+                visited_nodes[nid] = True
+    return None
+
+''' BFS 
+    Unused due to opt. BFS being implemented.
+'''
 def get_valid_path(nodes, edges):
     path_steps = {}
 
@@ -92,7 +145,6 @@ def get_valid_path(nodes, edges):
     queue.append(nodes[0])
     path_steps[0] = None
     visited_nodes[0] = True
-
 
     while queue:
         # dequeue first vertex in queue
@@ -121,9 +173,7 @@ def get_full_path(path_dict, nid):
         nid = path_dict[nid]
     cur_path.append(0)
     cur_path.reverse()
-    
     return cur_path
-
 
 '''returns the current maximum throughput on the given path.'''
 def bottleneck(nodes, edges, path):
@@ -197,11 +247,12 @@ def augment(nodes, edges, path):
             
     return edges
 
+
 def max_flow_alg(nodes, edges):
-    path = get_valid_path(nodes, edges)
+    path = optimized_valid_path(nodes, edges)
     while path:
         edges = augment(nodes, edges, path)
-        path = get_valid_path(nodes, edges)
+        path = optimized_valid_path(nodes, edges)
     return edges
 '''Algorithm end'''
 
