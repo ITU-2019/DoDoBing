@@ -6,8 +6,6 @@ from main import *
 (nodes_3, s3, t3, c3, e3) = parse_red_file("../data/increase-n8-1.txt")
 
 
-def test_01():
-	assert 1 == 1
 
 def test_parse_common_1_20():
 	assert nodes_1["purls"].red == True

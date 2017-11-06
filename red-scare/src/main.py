@@ -79,9 +79,20 @@ class Node:
     def __str__(self):
         pass
 
-def output(file_name, number_of_nodes, results):
-    pass
+def output(instance_name, nodes_len, a_res, f_res, m_res, n_res, s_res, latex):
     
+    res = "{:<20}".format(instance_name ) + "|"
+    res += "{:>8}".format(str(nodes_len)) + " |"
+    res += "{:>6}".format(str(a_res)    ) + " |"
+    res += "{:>6}".format(str(f_res)    ) + " |"
+    res += "{:>6}".format(str(m_res)    ) + " |"
+    res += "{:>6}".format(str(n_res)    ) + " |"
+    res += "{:>6}".format(str(s_res)    )
+        
+    if latex:
+        return res.replace("|", "&")
+    else:
+        return "|| " + res + " ||"
 
 '''Helper methods end'''
 
