@@ -15,6 +15,7 @@ def parse_red_file(filename):
     total_nodes = 0
     total_edges = 0
     pass
+    return None
     ## TODO FIX THE PARSER ...
     with open(filename) as f:
         lines = f.readlines()
@@ -96,8 +97,8 @@ def s(nodes, start_node_id, end_node_id):
 if __name__ == "__main__":
     args = sys.argv
     if len(args) == 2:
-        fine_name = args[1]
-        nodes, start_node_id , end_node_id = parse_red_file(filename)
+        file_name = args[1]
+        nodes, start_node_id , end_node_id = parse_red_file(file_name)
 
         # index :
             # A = 0
