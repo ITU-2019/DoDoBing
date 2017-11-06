@@ -87,23 +87,23 @@ def output(file_name, number_of_nodes, results):
 
 '''Algorithm'''
 #altenate
-def a(nodes, start_node_id, end_node_id):
+def a(nodes, start_node_id, end_node_id, cardinality, total_edges):
     pass
 
 #few
-def f(nodes, start_node_id, end_node_id):
+def f(nodes, start_node_id, end_node_id, cardinality, total_edges):
     pass
 
 #many
-def m(nodes, start_node_id, end_node_id):
+def m(nodes, start_node_id, end_node_id, cardinality, total_edges):
     pass
 
 #none
-def n(nodes, start_node_id, end_node_id):
+def n(nodes, start_node_id, end_node_id, cardinality, total_edges):
     pass
 
 #some
-def s(nodes, start_node_id, end_node_id):
+def s(nodes, start_node_id, end_node_id, cardinality, total_edges):
     pass
 
 
@@ -114,7 +114,7 @@ if __name__ == "__main__":
     args = sys.argv
     if len(args) == 2:
         file_name = args[1]
-        nodes, start_node_id , end_node_id = parse_red_file(file_name)
+        nodes, start_node_id , end_node_id, cardinality, total_edges = parse_red_file(file_name)
 
         # index :
             # A = 0
