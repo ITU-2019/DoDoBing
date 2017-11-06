@@ -3,61 +3,77 @@ import sys
 
 '''Parse'''
 def parse_red_file(filename):
-    nodes = []
+    nodes = {}
 
     node_counter = 0
     edge_counter = 0
 
 
-    parsing_nodes = False
+    parsing_nodes = True
     parsing_edges = False
 
-    total_nodes = 0
-    total_edges = 0
-    pass
-    ## TODO FIX THE PARSER ...
     with open(filename) as f:
         lines = f.readlines()
-        for line in lines:
+
+        first_line = lines[0].split(' ')
+        total_nodes = int(first_line[0])
+        total_edges = int(first_line[1])
+        cardinality = int(first_line[2])
+
+        second_line = lines[1].split(' ')
+        s = second_line[0]
+        t = second_line[1]
+
+        for line in lines[1:]:
             if parsing_edges:
                 string_integers = line.split(' ')
-                node_id_1 = int(string_integers[0])
-                node_id_2 = int(string_integers[1])
-                capacity = int(string_integers[2])
-                edges.append( Edge(node_id_1, node_id_2, capacity, flow))
-                nodes[node_id_1].addEdgeTo(node_id_2, edge_counter)
-                nodes[node_id_2].addEdgeTo(node_id_1, edge_counter)
+                node_id_1 = string_integers[0]
+                edge_type = string_integers[1]
+                node_id_2 = string_integers[2]
+
+                if edge_type == "--":
+                    nodes[node_id_1].add_edge_out(node_id_2)
+                    nodes[node_id_1].add_edge_in(node_id_2)
+                    nodes[node_id_2].add_edge_out(node_id_1)
+                    nodes[node_id_2].add_edge_in(node_id_1)
+
+                elif edge_type == "->":
+                    nodes[node_id_1].add_edge_out(node_id_2)
+                    nodes[node_id_2].add_edge_in(node_id_1)
+
                 edge_counter += 1
                 if edge_counter == total_edges:
                     parsing_edges = False
                 continue
+
             if parsing_nodes:
-                nodes.append(Node(line[:-1], node_counter))
+                node = line.split(' ')
+                red = (node.length > 1)
+                nodes.add(node[0], Node(red))
                 node_counter += 1
                 if node_counter == total_nodes:
                     parsing_nodes = False
+                    parsing_edges = True
                 continue
-            if total_nodes == 0:
-                total_nodes = int(line)
-                parsing_nodes = True
-                continue
-            if total_edges == 0:
-                total_edges = int(line)
-                parsing_edges = True
 
-    return(nodes,edges)
+    return nodes
 
 '''Parse end'''
 
 '''Helper methods'''
 
 class Node:
-    def __init__(self, node_id_string):
-        self.id = node_id_string
-        self.related_edges = []
+    def __init__(self, red):
+        self.red = red
+        #self.id = node_id_string
+        self.edges_out = {}
+        self.edges_in = {}
 
-    def addEdgeTo(self, node_id_string):
-        self.related_edges.append(node_id_string)
+    def add_edge_out(self, node_id_string):
+        self.edges_out.add(node_id_string)
+
+    def add_edge_in(self, node_id_string): 
+        self.edges_in.add(node_id_string)   
     
     def __str__(self):
         pass
