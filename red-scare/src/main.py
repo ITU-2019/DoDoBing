@@ -128,7 +128,7 @@ def n(nodes, start_node_id, end_node_id, cardinality, total_edges):
                 return get_full_path(path_steps, end_node_id)
 
             # check if node is red
-            if nodes[nodes].red:
+            if nodes[node].red:
                 continue
 
             # Check if we didn't visit node before
