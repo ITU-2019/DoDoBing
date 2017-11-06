@@ -140,7 +140,7 @@ if __name__ == "__main__":
 
     file_name = args["input"]
     nodes, start_node_id , end_node_id, cardinality, nodes_len, total_edges = parse_red_file(file_name)
-    n_res, s_res, m_res, f_res, a_res = None, None, None, None, None
+    n_res, s_res, m_res, f_res, a_res = "?","?","?","?","?"
 
     if args["none"]:
         n_res = n(nodes, start_node_id , end_node_id, cardinality, total_edges)
