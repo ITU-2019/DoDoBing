@@ -122,7 +122,7 @@ def a(nodes, start_node_id, end_node_id, cardinality, total_edges):
 
 #few
 def f(nodes, start_node_id, end_node_id, cardinality, total_edges):
-    pass
+    return bfs_few(nodes, start_node_id, end_node_id)
 
 #many
 def m(nodes, start_node_id, end_node_id, cardinality, total_edges):
@@ -181,7 +181,35 @@ def s(nodes, start_node_id, end_node_id, cardinality, total_edges):
 
     pass
 
-
+def bfs_few(nodes, start_id, end_id):
+    visited = set([])
+    start_node = nodes[start_id]
+    count = 0 #Current amount of Red nodes visited before, for current path..
+    if start_node.red:
+        count = 1
+    end_node = nodes[end_id]
+    green_frontier = [start_node]
+    red_frontier = []
+    while green_frontier:
+        current_node = green_frontier.pop()
+        if current_node == end_node:
+            return count
+        for str_id in current_node.edges_out:
+            node = nodes[str_id]
+            if node.red:
+                if node not in red_frontier:
+                    red_frontier.append(node)
+            else:
+                if node not in green_frontier:
+                    green_frontier.append(node)
+        
+        visited.add(current_node)
+        if not green_frontier and red_frontier:
+            green_frontier = red_frontier
+            red_frontier = []
+            count += 1
+            
+    return -1
 '''Algorithm end'''
 
 '''RUN CODE'''
