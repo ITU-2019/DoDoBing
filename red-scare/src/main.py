@@ -174,10 +174,59 @@ def m(nodes, start_node_id, end_node_id, cardinality, total_edges):
                 
 
 
-#none
+# None
 def n(nodes, start_node_id, end_node_id, cardinality, total_edges):
-    pass
+    if nodes[end_node_id].red:
+        return '-'
+    # steps dict
+    path_steps = {}
 
+    # visited nodes tracker
+    visited_nodes = set([])
+
+    # nodes queue
+    queue = []
+
+    queue.append(start_node_id)
+
+    # empty start path, origin node has no before node (None)
+    path_steps[start_node_id] = None
+    visited_nodes.add(start_node_id)
+
+    while queue:
+        # dequeue firstmost node in queue
+        cur_node = queue.pop(0)
+
+        # iterate to all subnodes
+        for node in nodes[cur_node].edges_out:
+            # Last node, the end
+            if node == end_node_id:
+                path_steps[node] = cur_node
+                # find and return length of path
+                return get_full_path(path_steps, end_node_id)
+
+            # check if node is red
+            if nodes[node].red:
+                continue
+
+            # Check if we didn't visit node before
+            if node not in visited_nodes:
+                # enqueue node
+                queue.append(node)
+                path_steps[node] = cur_node
+                visited_nodes.add(node)
+    return '-'
+
+''' Traceback the valid path from a certain nid, return length of path '''
+def get_full_path(path_dict, nid):
+    cur_path = []
+    while path_dict[nid] != None:
+        cur_path.append(nid)
+        nid = path_dict[nid]
+    # Append end node to make sure length is not (path-1) length
+    #cur_path.append("0")
+    return len(cur_path)
+  
 #some
 def s(nodes, start_node_id, end_node_id, cardinality, total_edges):
     # steps dict
@@ -224,8 +273,6 @@ def s(nodes, start_node_id, end_node_id, cardinality, total_edges):
                     path_steps[node] = (cur_node, path_steps[cur_node][1])
                 visited_nodes.add(node)
     return False
-
-    pass
 
 def bfs_few(nodes, start_id, end_id):
     visited = set([])
