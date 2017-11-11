@@ -57,7 +57,7 @@ def parse_red_file(filename):
                     parsing_edges = True
                 continue
 
-    return (nodes,s,t, cardinality, total_edges)
+    return (nodes,s,t, cardinality, total_nodes, total_edges)
 
 '''Parse end'''
 
@@ -100,6 +100,8 @@ def m(nodes, start_node_id, end_node_id, cardinality, total_edges):
 
 # None
 def n(nodes, start_node_id, end_node_id, cardinality, total_edges):
+    if nodes[end_node_id].red:
+        return '-'
     # steps dict
     path_steps = {}
 
@@ -137,7 +139,7 @@ def n(nodes, start_node_id, end_node_id, cardinality, total_edges):
                 queue.append(node)
                 path_steps[node] = cur_node
                 visited_nodes.add(node)
-    return -1
+    return '-'
 
 #some
 def s(nodes, start_node_id, end_node_id, cardinality, total_edges):
@@ -150,7 +152,7 @@ def get_full_path(path_dict, nid):
         cur_path.append(nid)
         nid = path_dict[nid]
     # Append end node to make sure length is not (path-1) length
-    cur_path.append("0")
+    #cur_path.append("0")
     return len(cur_path)
 
 '''Algorithm end'''
