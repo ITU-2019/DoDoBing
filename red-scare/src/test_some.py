@@ -10,4 +10,4 @@ def test_common_1_100_some():
 
 (nodes_3, s3, t3, c3, n3, e3) = parse_red_file("../data/increase-n8-1.txt")
 def test_increase_n8_1_some():
-    assert s(nodes_2,s2,t2,c2,e2) == True
+    assert s(nodes_3,s3,t3,c3,e3) == True
