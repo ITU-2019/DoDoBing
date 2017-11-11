@@ -17,3 +17,4 @@ script:
   - nosetests -vd -w flow/src test_path.py
   - nosetests -vd -w flow/src test_cut.py
   - nosetests -vd -w red-scare/src test_parser.py
+  - nosetests -vd -w red-scare/src test_some.py
