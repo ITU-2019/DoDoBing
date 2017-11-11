@@ -105,7 +105,7 @@ def a(nodes, start_node_id, end_node_id, cardinality, total_edges):
     start_node = nodes[start_node_id]
     queue = [start_node]
     while len(queue) > 0:
-        node = queue.pop(0)
+        node = queue.pop() # this makes it DFS, if we use pop(0) its BFS.
         for node_id in node.edges_out:
             if node_id not in visited:
                 if nodes[node_id].red != node.red: #if not the same colour
