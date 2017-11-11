@@ -122,7 +122,7 @@ def a(nodes, start_node_id, end_node_id, cardinality, total_edges):
 
 #few
 def f(nodes, start_node_id, end_node_id, cardinality, total_edges):
-    pass
+    return bfs_few(nodes, start_node_id, end_node_id)
 
 #many
 def m(nodes, start_node_id, end_node_id, cardinality, total_edges):
@@ -171,10 +171,6 @@ def n(nodes, start_node_id, end_node_id, cardinality, total_edges):
                 visited_nodes.add(node)
     return '-'
 
-#some
-def s(nodes, start_node_id, end_node_id, cardinality, total_edges):
-    pass
-
 ''' Traceback the valid path from a certain nid, return length of path '''
 def get_full_path(path_dict, nid):
     cur_path = []
@@ -184,7 +180,83 @@ def get_full_path(path_dict, nid):
     # Append end node to make sure length is not (path-1) length
     #cur_path.append("0")
     return len(cur_path)
+  
+#some
+def s(nodes, start_node_id, end_node_id, cardinality, total_edges):
+    # steps dict
+    path_steps = {}
 
+    # visited nodes tracker
+    visited_nodes = set([])
+
+    # nodes queue
+    queue = []
+
+    queue.append(start_node_id)
+
+    # empty start path, origin node has no before node (None)
+    # sanity check: if start node is red for some godforsaken reason
+    if nodes[start_node_id].red:
+        path_steps[start_node_id] = (None, 1)
+    else:
+        path_steps[start_node_id] = (None, 0)
+
+    visited_nodes.add(start_node_id)
+
+    while queue:
+        # dequeue firstmost node in queue
+        cur_node = queue.pop(0)
+
+        # iterate to all subnodes
+        for node in nodes[cur_node].edges_out:
+            # Last node, the end
+            # Check if we have at least one red node in path
+            # Or check if end node is red for some sanity reason
+            if node == end_node_id and (path_steps[cur_node][1] > 0 or nodes[node].red):
+                # return True - we have a path with at least one red node.
+                return True
+
+            # Check if we didn't visit node before
+            if node not in visited_nodes:
+                # enqueue node
+                queue.append(node)
+                # if node red
+                if nodes[node].red:
+                    path_steps[node] = (cur_node, path_steps[cur_node][1] + 1)
+                else:
+                    path_steps[node] = (cur_node, path_steps[cur_node][1])
+                visited_nodes.add(node)
+    return False
+
+def bfs_few(nodes, start_id, end_id):
+    visited = set([])
+    start_node = nodes[start_id]
+    count = 0 #Current amount of Red nodes visited before, for current path..
+    if start_node.red:
+        count = 1
+    end_node = nodes[end_id]
+    green_frontier = [start_node]
+    red_frontier = []
+    while green_frontier:
+        current_node = green_frontier.pop()
+        if current_node == end_node:
+            return count
+        for str_id in current_node.edges_out:
+            node = nodes[str_id]
+            if node.red:
+                if node not in red_frontier:
+                    red_frontier.append(node)
+            else:
+                if node not in green_frontier:
+                    green_frontier.append(node)
+        
+        visited.add(current_node)
+        if not green_frontier and red_frontier:
+            green_frontier = red_frontier
+            red_frontier = []
+            count += 1
+            
+    return -1
 '''Algorithm end'''
 
 '''RUN CODE'''
