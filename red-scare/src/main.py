@@ -124,9 +124,55 @@ def a(nodes, start_node_id, end_node_id, cardinality, total_edges):
 def f(nodes, start_node_id, end_node_id, cardinality, total_edges):
     return bfs_few(nodes, start_node_id, end_node_id)
 
+class Path_node:
+    def __init__(self, node_id, parent_path_node):
+        self.node_id = node_id
+        self.parent_path_node = parent_path_node
+    
+    def in_path(self, new_node_id):
+        if new_node_id != self.node_id:
+            if self.parent_path_node == None: # Root
+                return False
+            return self.parent_path_node.in_path(new_node_id)
+        else:
+            return True
+    
+    def reds_in_path_counter(self, nodes,  count):
+        if nodes[self.node_id].red:
+            if self.parent_path_node == None: # Root
+                return count + 1 
+            return self.parent_path_node.reds_in_path_counter( nodes, count + 1)
+        else:
+            if self.parent_path_node == None: # Root
+                return count
+            return self.parent_path_node.reds_in_path_counter( nodes, count)
+    
+    def __str__(self):
+        if self.parent_path_node == None: # Root
+            return self.node_id
+        return self.node_id + " -- " + str(self.parent_path_node)
+
 #many
 def m(nodes, start_node_id, end_node_id, cardinality, total_edges):
-    pass
+    queue = [Path_node(start_node_id, None)]
+    maxLength = -1
+    while len(queue) > 0:
+        path_node = queue.pop()
+        for node_id in nodes[path_node.node_id].edges_out:
+            if not path_node.in_path(node_id):
+                new_path_node = Path_node(node_id, path_node)
+                if node_id != end_node_id:
+                    queue.append(new_path_node)
+                else:
+                    length = new_path_node.reds_in_path_counter(nodes, 0)
+                    if length > maxLength:
+                        maxLength = length
+    if maxLength != -1:
+        return maxLength
+    else:
+        return '-'
+                
+
 
 #none
 def n(nodes, start_node_id, end_node_id, cardinality, total_edges):
