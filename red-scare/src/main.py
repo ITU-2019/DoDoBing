@@ -101,7 +101,24 @@ def output(instance_name, nodes_len, a_res, f_res, m_res, n_res, s_res, latex):
 '''Algorithm'''
 #altenate
 def a(nodes, start_node_id, end_node_id, cardinality, total_edges):
-    pass
+    visited = set([start_node_id])
+    start_node = nodes[start_node_id]
+    queue = [start_node]
+    while len(queue) > 0:
+        node = queue.pop(0)
+        for node_id in node.edges_out:
+            if node_id not in visited:
+                if nodes[node_id].red != node.red: #if not the same colour
+                    if node_id == end_node_id:
+                        return True
+                    queue.append(nodes[node_id])
+                    visited.add(node_id)
+    return False
+
+
+
+
+
 
 #few
 def f(nodes, start_node_id, end_node_id, cardinality, total_edges):
