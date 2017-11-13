@@ -47,7 +47,6 @@ def parse_red_file(filename):
                     continue
                 else:
                     parsing_edges = False
-
             if parsing_nodes:
                 node = line.split(' ')
                 red = (len(node) > 1)
@@ -57,9 +56,7 @@ def parse_red_file(filename):
                     parsing_nodes = False
                     parsing_edges = True
                 continue
-
     return (nodes,s,t, cardinality, total_nodes, total_edges)
-
 '''Parse end'''
 
 '''Helper methods'''
@@ -75,14 +72,10 @@ class Node:
         self.edges_out.add(node_id_string)
 
     def add_edge_in(self, node_id_string): 
-        self.edges_in.add(node_id_string)   
-    
-    def __str__(self):
-        pass
+        self.edges_in.add(node_id_string)
 
 def output(instance_name, nodes_len, a_res, f_res, m_res, n_res, s_res, latex):
-    instance_name = instance_name.replace(".txt","").replace("../data/","") 
-
+    instance_name = instance_name.replace(".txt","").replace("../data/","")
     res = "{:<20}".format(instance_name) + "|"
     res += "{:>8}".format(str(nodes_len)) + " |"
     res += "{:>6}".format(str(a_res)    ) + " |"
@@ -90,39 +83,10 @@ def output(instance_name, nodes_len, a_res, f_res, m_res, n_res, s_res, latex):
     res += "{:>6}".format(str(m_res)    ) + " |"
     res += "{:>6}".format(str(n_res)    ) + " |"
     res += "{:>6}".format(str(s_res)    )
-    
     if latex:
         return res.replace("|", "&")
     else:
         return "|| " + res + " ||"
-
-'''Helper methods end'''
-
-'''Algorithm'''
-#altenate
-def a(nodes, start_node_id, end_node_id, cardinality, total_edges):
-    visited = set([start_node_id])
-    start_node = nodes[start_node_id]
-    queue = [start_node]
-    while len(queue) > 0:
-        node = queue.pop() # this makes it DFS, if we use pop(0) its BFS.
-        for node_id in node.edges_out:
-            if node_id not in visited:
-                if nodes[node_id].red != node.red: #if not the same colour
-                    if node_id == end_node_id:
-                        return True
-                    queue.append(nodes[node_id])
-                    visited.add(node_id)
-    return False
-
-
-
-
-
-
-#few
-def f(nodes, start_node_id, end_node_id, cardinality, total_edges):
-    return bfs_few(nodes, start_node_id, end_node_id)
 
 class Path_node:
     def __init__(self, node_id, parent_path_node):
@@ -152,32 +116,92 @@ class Path_node:
             return self.node_id
         return self.node_id + " -- " + str(self.parent_path_node)
 
+''' Traceback the valid path from a certain nid, return length of path '''
+def get_full_path(path_dict, nid):
+    cur_path = []
+    while path_dict[nid] != None:
+        cur_path.append(nid)
+        nid = path_dict[nid]
+    return len(cur_path)
+
+'''Helper methods end'''
+
+'''Algorithm'''
+#alternate
+def a(nodes, start_node_id, end_node_id, cardinality, total_edges):
+    visited = set([start_node_id])
+    start_node = nodes[start_node_id]
+    queue = [start_node]
+    while len(queue) > 0:
+        node = queue.pop() # this makes it DFS, if we use pop(0) its BFS.
+        for node_id in node.edges_out:
+            if node_id not in visited:
+                if nodes[node_id].red != node.red: #if not the same colour
+                    if node_id == end_node_id:
+                        return True
+                    queue.append(nodes[node_id])
+                    visited.add(node_id)
+    return False
+
+#few
+def f(nodes, start_node_id, end_node_id, cardinality, total_edges):
+    visited = set([])
+    start_node = nodes[start_node_id]
+    count = 0 #Current amount of Red nodes visited before, for current path..
+    if start_node.red:
+        count = 1
+    end_node = nodes[end_node_id]
+    green_frontier = [start_node]
+    red_frontier = []
+    while green_frontier:
+        current_node = green_frontier.pop()
+        if current_node == end_node:
+            return count
+        for str_id in current_node.edges_out:
+            node = nodes[str_id]
+            if node not in visited:
+                if node.red:
+                    if node not in red_frontier:
+                        red_frontier.append(node)
+                else:
+                    if node not in green_frontier:
+                        green_frontier.append(node)
+        
+        visited.add(current_node)
+        if not green_frontier and red_frontier:
+            green_frontier = red_frontier
+            red_frontier = []
+            count += 1
+
+    return '-'
+
 #many
 def m(nodes, start_node_id, end_node_id, cardinality, total_edges):
-    queue = [Path_node(start_node_id, None)]
-    maxLength = -1
-    while len(queue) > 0:
-        path_node = queue.pop()
-        for node_id in nodes[path_node.node_id].edges_out:
-            if not path_node.in_path(node_id):
-                new_path_node = Path_node(node_id, path_node)
-                if node_id != end_node_id:
-                    queue.append(new_path_node)
-                else:
-                    length = new_path_node.reds_in_path_counter(nodes, 0)
-                    if length > maxLength:
-                        maxLength = length
-    if maxLength != -1:
-        return maxLength
-    else:
+    if s(nodes, start_node_id, end_node_id, cardinality, total_edges): 
+        queue = [Path_node(start_node_id, None)]
+        maxLength = -1
+        while len(queue) > 0:
+            path_node = queue.pop()
+            for node_id in nodes[path_node.node_id].edges_out:
+                if not path_node.in_path(node_id):
+                    new_path_node = Path_node(node_id, path_node)
+                    if node_id != end_node_id:
+                        queue.append(new_path_node)
+                    else:
+                        length = new_path_node.reds_in_path_counter(nodes, 0)
+                        if length > maxLength:
+                            maxLength = length
+                            if maxLength == cardinality:
+                                return maxLength
+        if maxLength != -1:
+            return maxLength
+        else:
+            return '-'
+    else: 
         return '-'
-                
-
 
 # None
 def n(nodes, start_node_id, end_node_id, cardinality, total_edges):
-    if nodes[end_node_id].red:
-        return '-'
     # steps dict
     path_steps = {}
 
@@ -216,16 +240,6 @@ def n(nodes, start_node_id, end_node_id, cardinality, total_edges):
                 path_steps[node] = cur_node
                 visited_nodes.add(node)
     return '-'
-
-''' Traceback the valid path from a certain nid, return length of path '''
-def get_full_path(path_dict, nid):
-    cur_path = []
-    while path_dict[nid] != None:
-        cur_path.append(nid)
-        nid = path_dict[nid]
-    # Append end node to make sure length is not (path-1) length
-    #cur_path.append("0")
-    return len(cur_path)
   
 #some
 def s(nodes, start_node_id, end_node_id, cardinality, total_edges):
@@ -274,35 +288,6 @@ def s(nodes, start_node_id, end_node_id, cardinality, total_edges):
                 visited_nodes.add(node)
     return False
 
-def bfs_few(nodes, start_id, end_id):
-    visited = set([])
-    start_node = nodes[start_id]
-    count = 0 #Current amount of Red nodes visited before, for current path..
-    if start_node.red:
-        count = 1
-    end_node = nodes[end_id]
-    green_frontier = [start_node]
-    red_frontier = []
-    while green_frontier:
-        current_node = green_frontier.pop()
-        if current_node == end_node:
-            return count
-        for str_id in current_node.edges_out:
-            node = nodes[str_id]
-            if node.red:
-                if node not in red_frontier:
-                    red_frontier.append(node)
-            else:
-                if node not in green_frontier:
-                    green_frontier.append(node)
-        
-        visited.add(current_node)
-        if not green_frontier and red_frontier:
-            green_frontier = red_frontier
-            red_frontier = []
-            count += 1
-            
-    return -1
 '''Algorithm end'''
 
 '''RUN CODE'''
