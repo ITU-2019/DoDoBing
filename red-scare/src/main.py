@@ -131,8 +131,7 @@ def try_reduce(nodes, node_id, start_node_id, end_node_id):
     #1) If the current node does not have any edges out and is not t or s: remove.
     #2) If the current node has only one edge out and an one edge in from that same edge, remove.
     #3) If the current node is not red and has one edge out and is not t or s, redirect in-edges to out-edge. 
-    #4) If the current node is not red and has one edge in and one edge out, point the node in to the node out. (already checked)
-    #5) If the current node is not red and has two edges in from two different nodes and has two edges out to two different nodes that are the same as the in-nodes, then point the in-node and out-node to each other. 
+    #4) If the current node is not red and has two edges in from two different nodes and has two edges out to two different nodes that are the same as the in-nodes, then point the in-node and out-node to each other. 
 
     if node_id != start_node_id and node_id != end_node_id:
         current_node = nodes[node_id]
@@ -171,7 +170,7 @@ def try_reduce(nodes, node_id, start_node_id, end_node_id):
                     current_edge_out = current_node.edges_out.pop()
                     nodes[edge_in].edges_out.add(current_edge_out) #Add current nodes out-node
 
-        #5)
+        #4)
         if len(current_node.edges_out) == 2 and len(current_node.edges_in) == 2 and not current_node.red:
             if len(current_node.edges_out.intersection(current_node.edges_in)) == 2:
                 o_0 = current_node.edges_out.pop()
