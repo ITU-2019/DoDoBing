@@ -164,8 +164,8 @@ def try_reduce(nodes, node_id, start_node_id, end_node_id):
         #5)
         if len(current_node.edges_out) == 2 and len(current_node.edges_in) == 2 and not current_node.red:
             if len(current_node.edges_out.intersection(current_node.edges_in)) == 2:
-                o_0 = current_node.edges_out[0]
-                o_1 = current_node.edges_out[1]
+                o_0 = current_node.edges_out.pop()
+                o_1 = current_node.edges_out.pop()
                 nodes[o_0].edges_out.remove(node_id)
                 nodes[o_0].edges_in.remove(node_id)
                 nodes[o_1].edges_out.remove(node_id)
