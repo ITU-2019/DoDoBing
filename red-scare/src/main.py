@@ -124,6 +124,77 @@ def get_full_path(path_dict, nid):
         nid = path_dict[nid]
     return len(cur_path)
 
+
+
+def try_reduce(nodes, node_id, start_node_id, end_node_id):
+
+    #1) If the current node does not have any edges out and is not t or s: remove.
+    #2) If the current node has only one edge out and an one edge in from that same edge, remove.
+    #3) If the current node is not red and has one edge out and is not t or s, redirect in-edges to out-edge. 
+    #4) If the current node is not red and has two edges in from two different nodes and has two edges out to two different nodes that are the same as the in-nodes, then point the in-node and out-node to each other. 
+
+    if node_id != start_node_id and node_id != end_node_id:
+        current_node = nodes[node_id]
+
+        #1)
+        if len(current_node.edges_out) == 0 and len(current_node.edges_in) > 0:
+            for edge_in in current_node.edges_in:
+                if node_id in nodes[edge_in].edges_out:
+                    nodes[edge_in].edges_out.remove(node_id)
+                    try_reduce(nodes, edge_in, start_node_id, end_node_id)
+
+
+        #2)
+        if  len(current_node.edges_in) == 1 and \
+            len(current_node.edges_out) == 1:
+            edge_in = current_node.edges_in.pop()
+            edge_out = current_node.edges_out.pop()
+            if edge_in == edge_out:
+
+                if (node_id in nodes[edge_in].edges_out) and (node_id  in nodes[edge_in].edges_in):
+                    nodes[edge_in].edges_out.remove(node_id)
+                    nodes[edge_in].edges_in.remove(node_id)
+                elif node_id in nodes[edge_in].edges_out:
+                    nodes[edge_in].edges_out.remove(node_id)
+                elif node_id  in nodes[edge_in].edges_in:
+                    nodes[edge_in].edges_in.remove(node_id)
+            else:
+                current_node.edges_in.add(edge_in)
+                current_node.edges_out.add(edge_out)
+
+        #3)
+        if len(current_node.edges_out) == 1 and not current_node.red:
+            for edge_in in current_node.edges_in:
+                if edge_in not in current_node.edges_out and node_id in nodes[edge_in].edges_out:
+                    nodes[edge_in].edges_out.remove(node_id) #Remove current node
+                    current_edge_out = current_node.edges_out.pop()
+                    nodes[edge_in].edges_out.add(current_edge_out) #Add current nodes out-node
+
+        #4)
+        if len(current_node.edges_out) == 2 and len(current_node.edges_in) == 2 and not current_node.red:
+            if len(current_node.edges_out.intersection(current_node.edges_in)) == 2:
+                o_0 = current_node.edges_out.pop()
+                o_1 = current_node.edges_out.pop()
+                nodes[o_0].edges_out.remove(node_id)
+                nodes[o_0].edges_in.remove(node_id)
+                nodes[o_1].edges_out.remove(node_id)
+                nodes[o_1].edges_in.remove(node_id)
+                nodes[o_0].edges_out.add(o_1)
+                nodes[o_0].edges_in.add(o_1)
+                nodes[o_1].edges_out.add(o_0)
+                nodes[o_1].edges_in.add(o_0)
+                try_reduce(nodes, o_0, start_node_id, end_node_id)
+                try_reduce(nodes, o_1, start_node_id, end_node_id)
+
+                        
+
+def reduce_graph(nodes, start_node_id, end_node_id):
+    for node in nodes:
+        try_reduce(nodes, node, start_node_id, end_node_id)
+    for node in nodes:
+        try_reduce(nodes, node, start_node_id, end_node_id)
+    return nodes
+
 '''Helper methods end'''
 
 '''Algorithm'''
@@ -177,27 +248,24 @@ def f(nodes, start_node_id, end_node_id, cardinality, total_edges):
 
 #many
 def m(nodes, start_node_id, end_node_id, cardinality, total_edges):
-    if s(nodes, start_node_id, end_node_id, cardinality, total_edges): 
-        queue = [Path_node(start_node_id, None)]
-        maxLength = -1
-        while len(queue) > 0:
-            path_node = queue.pop()
-            for node_id in nodes[path_node.node_id].edges_out:
-                if not path_node.in_path(node_id):
-                    new_path_node = Path_node(node_id, path_node)
-                    if node_id != end_node_id:
-                        queue.append(new_path_node)
-                    else:
-                        length = new_path_node.reds_in_path_counter(nodes, 0)
-                        if length > maxLength:
-                            maxLength = length
-                            if maxLength == cardinality:
-                                return maxLength
-        if maxLength != -1:
-            return maxLength
-        else:
-            return '-'
-    else: 
+    queue = [Path_node(start_node_id, None)]
+    maxLength = -1
+    while len(queue) > 0:
+        path_node = queue.pop()
+        for node_id in nodes[path_node.node_id].edges_out:
+            if not path_node.in_path(node_id):
+                new_path_node = Path_node(node_id, path_node)
+                if node_id != end_node_id:
+                    queue.append(new_path_node)
+                else:
+                    length = new_path_node.reds_in_path_counter(nodes, 0)
+                    if length > maxLength:
+                        maxLength = length
+                        if maxLength == cardinality:
+                            return maxLength
+    if maxLength != -1:
+        return maxLength
+    else:
         return '-'
 
 # None
@@ -312,14 +380,19 @@ if __name__ == "__main__":
 
     if args["none"]:
         n_res = n(nodes, start_node_id , end_node_id, cardinality, total_edges)
+    if args["any"]:
+        a_res = a(nodes, start_node_id , end_node_id, cardinality, total_edges)
+
+
+    reduce_graph(nodes, start_node_id, end_node_id)
+
+
     if args["some"]: 
         s_res = s(nodes, start_node_id , end_node_id, cardinality, total_edges)
     if args["many"]:
         m_res = m(nodes, start_node_id , end_node_id, cardinality, total_edges)
     if args["few"]:
         f_res = f(nodes, start_node_id , end_node_id, cardinality, total_edges)
-    if args["any"]:
-        a_res = a(nodes, start_node_id , end_node_id, cardinality, total_edges)
 
     output = output(args["input"], nodes_len, a_res, f_res, m_res, n_res, s_res, args["latex"])
     print(output)
