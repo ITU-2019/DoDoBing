@@ -249,27 +249,24 @@ def f(nodes, start_node_id, end_node_id, cardinality, total_edges):
 
 #many
 def m(nodes, start_node_id, end_node_id, cardinality, total_edges):
-    if s(nodes, start_node_id, end_node_id, cardinality, total_edges): 
-        queue = [Path_node(start_node_id, None)]
-        maxLength = -1
-        while len(queue) > 0:
-            path_node = queue.pop()
-            for node_id in nodes[path_node.node_id].edges_out:
-                if not path_node.in_path(node_id):
-                    new_path_node = Path_node(node_id, path_node)
-                    if node_id != end_node_id:
-                        queue.append(new_path_node)
-                    else:
-                        length = new_path_node.reds_in_path_counter(nodes, 0)
-                        if length > maxLength:
-                            maxLength = length
-                            if maxLength == cardinality:
-                                return maxLength
-        if maxLength != -1:
-            return maxLength
-        else:
-            return '-'
-    else: 
+    queue = [Path_node(start_node_id, None)]
+    maxLength = -1
+    while len(queue) > 0:
+        path_node = queue.pop()
+        for node_id in nodes[path_node.node_id].edges_out:
+            if not path_node.in_path(node_id):
+                new_path_node = Path_node(node_id, path_node)
+                if node_id != end_node_id:
+                    queue.append(new_path_node)
+                else:
+                    length = new_path_node.reds_in_path_counter(nodes, 0)
+                    if length > maxLength:
+                        maxLength = length
+                        if maxLength == cardinality:
+                            return maxLength
+    if maxLength != -1:
+        return maxLength
+    else:
         return '-'
 
 # None
