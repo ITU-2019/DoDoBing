@@ -128,27 +128,53 @@ def get_full_path(path_dict, nid):
 
 def try_reduce(nodes, node_id, start_node_id, end_node_id):
 
+    #1) If the current node does not have any edges out and is not t or s: remove.
+    #2) If the current node has only one edge out and an one edge in from that same edge, remove.
+    #3) If the current node is not red and has one edge out and is not t or s, redirect in-edges to out-edge. 
+    #4) If the current node is not red and has one edge in and one edge out, point the node in to the node out. (already checked)
+    #5) If the current node is not red and has two edges in from two different nodes and has two edges out to two different nodes that are the same as the in-nodes, then point the in-node and out-node to each other. 
+
     if node_id != start_node_id and node_id != end_node_id:
-        node = nodes[node_id]
-        if len(node.edges_in) == 2 and len(node.edges_out) == 2:
-            for ei in node.edges_in:
-                for eo in node.edges_out:
-                    
-                    if ei == eo:
+        current_node = nodes[node_id]
 
-                        if node_id in nodes[ei].edges_out:
-                            nodes[ei].edges_out.remove(node_id)
-                        #try_reduce(nodes, ei, start_node_id,end_node_id)
-                    elif not node.red:
+        #1)
+        if len(current_node.edges_out) == 0 and len(current_node.edges_in) > 0:
+            for edge_in in current_node.edges_in:
+                if node_id in nodes[edge_in].edges_out:
+                    nodes[edge_in].edges_out.remove(node_id)
+                    try_reduce(nodes, edge_in, start_node_id, end_node_id)
 
-                        if node_id in nodes[ei].edges_out:
-                            nodes[ei].edges_out.remove(node_id)
-                        if node_id in nodes[eo].edges_in:
-                            nodes[eo].edges_in.remove(node_id)
-                        nodes[ei].add_edge_out(eo)
-                        nodes[eo].add_edge_in(ei)
-                        #try_reduce(nodes, eo, start_node_id, end_node_id)
-                        #try_reduce(nodes, ei, start_node_id, end_node_id)
+
+        #2)
+        if  len(current_node.edges_in) == 1 and \
+            len(current_node.edges_out) == 1 and \
+            current_node.edges_in[0] == current_node.edges_out[0]:
+                for edge_in in current_node.edges_in:
+                    if node_id in nodes[edge_in].edges_out:
+                        nodes[edge_in].edges_out.remove(node_id)
+                        try_reduce(nodes, edge_in, start_node_id, end_node_id)
+
+        #3)
+        if len(current_node.edges_out) == 1 and not current_node.red:
+            for edge_in in current_node.edges_in:
+                if edge_in not in current_node.edges_out and node_id in nodes[edge_in].edges_out:
+                    nodes[edge_in].edges_out.remove(node_id) #Remove current node
+                    nodes[edge_in].edges_out.add(current_node.edges_out[0]) #Add current nodes out-node
+
+        #5)
+        if len(current_node.edges_out) == 2 and len(current_node.edges_in) == 2 and not current_node.red:
+            if len(current_node.edges_out.intersection(current_node.edges_in)) == 2:
+                o_0 = current_node.edges_out[0]
+                o_1 = current_node.edges_out[1]
+                nodes[o_0].edges_out.remove(node_id)
+                nodes[o_0].edges_in.remove(node_id)
+                nodes[o_1].edges_out.remove(node_id)
+                nodes[o_1].edges_in.remove(node_id)
+                nodes[o_0].edges_out.add(o_1)
+                nodes[o_0].edges_in.add(o_1)
+                nodes[o_1].edges_out.add(o_0)
+                nodes[o_1].edges_in.add(o_0)
+
                         
 
 def reduce_graph(nodes, start_node_id, end_node_id):
