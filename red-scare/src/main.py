@@ -147,19 +147,29 @@ def try_reduce(nodes, node_id, start_node_id, end_node_id):
 
         #2)
         if  len(current_node.edges_in) == 1 and \
-            len(current_node.edges_out) == 1 and \
-            current_node.edges_in[0] == current_node.edges_out[0]:
-                for edge_in in current_node.edges_in:
-                    if node_id in nodes[edge_in].edges_out:
-                        nodes[edge_in].edges_out.remove(node_id)
-                        try_reduce(nodes, edge_in, start_node_id, end_node_id)
+            len(current_node.edges_out) == 1:
+            edge_in = current_node.edges_in.pop()
+            edge_out = current_node.edges_out.pop()
+            if edge_in == edge_out:
+
+                if (node_id in nodes[edge_in].edges_out) and (node_id  in nodes[edge_in].edges_in):
+                    nodes[edge_in].edges_out.remove(node_id)
+                    nodes[edge_in].edges_in.remove(node_id)
+                elif node_id in nodes[edge_in].edges_out:
+                    nodes[edge_in].edges_out.remove(node_id)
+                elif node_id  in nodes[edge_in].edges_in:
+                    nodes[edge_in].edges_in.remove(node_id)
+            else:
+                current_node.edges_in.add(edge_in)
+                current_node.edges_out.add(edge_out)
 
         #3)
         if len(current_node.edges_out) == 1 and not current_node.red:
             for edge_in in current_node.edges_in:
                 if edge_in not in current_node.edges_out and node_id in nodes[edge_in].edges_out:
                     nodes[edge_in].edges_out.remove(node_id) #Remove current node
-                    nodes[edge_in].edges_out.add(current_node.edges_out[0]) #Add current nodes out-node
+                    current_edge_out = current_node.edges_out.pop()
+                    nodes[edge_in].edges_out.add(current_edge_out) #Add current nodes out-node
 
         #5)
         if len(current_node.edges_out) == 2 and len(current_node.edges_in) == 2 and not current_node.red:
@@ -174,10 +184,14 @@ def try_reduce(nodes, node_id, start_node_id, end_node_id):
                 nodes[o_0].edges_in.add(o_1)
                 nodes[o_1].edges_out.add(o_0)
                 nodes[o_1].edges_in.add(o_0)
+                try_reduce(nodes, o_0, start_node_id, end_node_id)
+                try_reduce(nodes, o_1, start_node_id, end_node_id)
 
                         
 
 def reduce_graph(nodes, start_node_id, end_node_id):
+    for node in nodes:
+        try_reduce(nodes, node, start_node_id, end_node_id)
     for node in nodes:
         try_reduce(nodes, node, start_node_id, end_node_id)
     return nodes
