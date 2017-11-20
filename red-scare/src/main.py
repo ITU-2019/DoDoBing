@@ -124,6 +124,38 @@ def get_full_path(path_dict, nid):
         nid = path_dict[nid]
     return len(cur_path)
 
+
+
+def try_reduce(nodes, node_id, start_node_id, end_node_id):
+
+    if node_id != start_node_id and node_id != end_node_id:
+        node = nodes[node_id]
+        if len(node.edges_in) == 2 and len(node.edges_out) == 2:
+            for ei in node.edges_in:
+                for eo in node.edges_out:
+                    
+                    if ei == eo:
+
+                        if node_id in nodes[ei].edges_out:
+                            nodes[ei].edges_out.remove(node_id)
+                        #try_reduce(nodes, ei, start_node_id,end_node_id)
+                    elif not node.red:
+
+                        if node_id in nodes[ei].edges_out:
+                            nodes[ei].edges_out.remove(node_id)
+                        if node_id in nodes[eo].edges_in:
+                            nodes[eo].edges_in.remove(node_id)
+                        nodes[ei].add_edge_out(eo)
+                        nodes[eo].add_edge_in(ei)
+                        #try_reduce(nodes, eo, start_node_id, end_node_id)
+                        #try_reduce(nodes, ei, start_node_id, end_node_id)
+                        
+
+def reduce_graph(nodes, start_node_id, end_node_id):
+    for node in nodes:
+        try_reduce(nodes, node, start_node_id, end_node_id)
+    return nodes
+
 '''Helper methods end'''
 
 '''Algorithm'''
@@ -312,14 +344,19 @@ if __name__ == "__main__":
 
     if args["none"]:
         n_res = n(nodes, start_node_id , end_node_id, cardinality, total_edges)
+    if args["any"]:
+        a_res = a(nodes, start_node_id , end_node_id, cardinality, total_edges)
+
+
+    reduce_graph(nodes, start_node_id, end_node_id)
+
+
     if args["some"]: 
         s_res = s(nodes, start_node_id , end_node_id, cardinality, total_edges)
     if args["many"]:
         m_res = m(nodes, start_node_id , end_node_id, cardinality, total_edges)
     if args["few"]:
         f_res = f(nodes, start_node_id , end_node_id, cardinality, total_edges)
-    if args["any"]:
-        a_res = a(nodes, start_node_id , end_node_id, cardinality, total_edges)
 
     output = output(args["input"], nodes_len, a_res, f_res, m_res, n_res, s_res, args["latex"])
     print(output)
