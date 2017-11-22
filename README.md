@@ -4,6 +4,8 @@
 
 ![DoDo](http://www.nhm.ac.uk/content/dam/nhmwww/our-science/news/2017/dodo-model-news-two-column.jpg "DoDo")
 
+![Bing](https://mymerrychristmas.com/x/wp-content/uploads/2015/10/bingcrosby.jpg "Bing")
+
 ### Requirements
 
 - python 3.x
