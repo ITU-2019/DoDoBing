@@ -54,9 +54,9 @@ python main.py -i ../data/gnm-5000-7500-0.txt  -nalf
 python main.py -i ../data/gnm-5000-7500-1.txt  -nalf
 python main.py -i ../data/gnm-5000-10000-0.txt -nalf
 python main.py -i ../data/gnm-5000-10000-1.txt -nalf
-python main.py -i ../data/grid-5-0.txt         -nsalf
-python main.py -i ../data/grid-5-1.txt         -nsalf
-python main.py -i ../data/grid-5-2.txt         -nsalf
+python main.py -i ../data/grid-5-0.txt         -nsmalf
+python main.py -i ../data/grid-5-1.txt         -nsmalf
+python main.py -i ../data/grid-5-2.txt         -nsmalf
 python main.py -i ../data/grid-10-0.txt        -nsalf
 python main.py -i ../data/grid-10-1.txt        -nsalf
 python main.py -i ../data/grid-10-2.txt        -nsalf
