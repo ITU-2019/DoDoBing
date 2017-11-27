@@ -167,10 +167,10 @@ def try_reduce(nodes, node_id, start_node_id, end_node_id):
 
         #3)
         if len(current_node.edges_out) == 1 and not current_node.red:
+            current_edge_out = current_node.edges_out.pop()
             for edge_in in current_node.edges_in:
                 if edge_in not in current_node.edges_out and node_id in nodes[edge_in].edges_out:
                     nodes[edge_in].edges_out.remove(node_id) #Remove current node
-                    current_edge_out = current_node.edges_out.pop()
                     nodes[edge_in].edges_out.add(current_edge_out) #Add current nodes out-node
 
         #4)
