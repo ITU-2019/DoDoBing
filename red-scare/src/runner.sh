@@ -141,7 +141,7 @@ python main.py -i ../data/wall-n-4.txt         -nsmalf
 python main.py -i ../data/wall-n-10.txt        -nsmalf
 python main.py -i ../data/wall-n-100.txt       -nalf
 python main.py -i ../data/wall-n-1000.txt      -nalf
-python main.py -i ../data/wall-n-10000.txt     -nal
+python main.py -i ../data/wall-n-10000.txt     -nalf
 python main.py -i ../data/wall-p-1.txt         -nsmalf
 python main.py -i ../data/wall-p-2.txt         -nsmalf
 python main.py -i ../data/wall-p-3.txt         -nsmalf
@@ -149,7 +149,7 @@ python main.py -i ../data/wall-p-4.txt         -nsmalf
 python main.py -i ../data/wall-p-10.txt        -nsmalf
 python main.py -i ../data/wall-p-100.txt       -nalf
 python main.py -i ../data/wall-p-1000.txt      -nalf
-python main.py -i ../data/wall-p-10000.txt     -nal
+python main.py -i ../data/wall-p-10000.txt     -nalf
 python main.py -i ../data/wall-z-1.txt         -nsmalf
 python main.py -i ../data/wall-z-2.txt         -nsmalf
 python main.py -i ../data/wall-z-3.txt         -nsmalf
@@ -157,4 +157,4 @@ python main.py -i ../data/wall-z-4.txt         -nsmalf
 python main.py -i ../data/wall-z-10.txt        -nsmalf
 python main.py -i ../data/wall-z-100.txt       -nalf
 python main.py -i ../data/wall-z-1000.txt      -nalf
-python main.py -i ../data/wall-z-10000.txt     -nal
+python main.py -i ../data/wall-z-10000.txt     -nalf

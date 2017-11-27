@@ -230,7 +230,7 @@ def f(nodes, start_node_id, end_node_id, cardinality, total_edges):
     green_frontier = [start_node]
     red_frontier = []
     while green_frontier:
-        current_node = green_frontier.pop()
+        current_node = green_frontier.pop(0)
         if current_node == end_node:
             return count
         for str_id in current_node.edges_out:
@@ -345,7 +345,7 @@ if __name__ == "__main__":
     ap.add_argument("-s", "--some",  required=False, help="Run 'Some' Algorithm", default=False, action = "store_true")
     ap.add_argument("-m", "--many",  required=False, help="Run 'Many' Algorithm", default=False, action = "store_true")
     ap.add_argument("-f", "--few",   required=False, help="Run 'Few' Algorithm",  default=False, action = "store_true")
-    ap.add_argument("-a", "--any",   required=False, help="Run 'Any' Algorithm",  default=False, action = "store_true")
+    ap.add_argument("-a", "--alternate",   required=False, help="Run 'Alternate' Algorithm",  default=False, action = "store_true")
     ap.add_argument("-l", "--latex", required=False, help="Output as LateX",      default=False, action = "store_true")
 
     #Parse Arguments Given to Main
@@ -357,7 +357,7 @@ if __name__ == "__main__":
 
     if args["none"]:
         n_res = n(nodes, start_node_id , end_node_id, cardinality, total_edges)
-    if args["any"]:
+    if args["alternate"]:
         a_res = a(nodes, start_node_id , end_node_id, cardinality, total_edges)
 
     reduce_graph(nodes, start_node_id, end_node_id)
